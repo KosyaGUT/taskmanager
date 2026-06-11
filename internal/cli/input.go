@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func acceptmessage() (target string) {
+func Acceptmessage() (target string) {
 	// Создаем сканер, который читает из стандартного ввода (консоли)
 	scanner := bufio.NewScanner(os.Stdin)
 

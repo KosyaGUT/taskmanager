@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"github.com/KosyaGUT/taskmanager/internal/cli"
 	"strconv"
 	"strings"
 )
@@ -14,18 +15,18 @@ func CreateTask(tasks []Task) []Task {
 			Author:      "",
 		}
 		fmt.Println("Напишите заголовок задачи:")
-		message := acceptmessage()
+		message := cli.Acceptmessage()
 		if message == "стоп" {
 			break
 		}
 		newTask.Title = message
 
 		fmt.Println("Кого поставить исполнителем в задачу?")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		newTask.Author = message
 
 		fmt.Println("Если нужно, то можете добавить описание к задаче.")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		newTask.Description = message
 
 		tasks = append(
@@ -40,7 +41,7 @@ func CreateTask(tasks []Task) []Task {
 
 		fmt.Println("Хотите ли еще задачу поставить?")
 
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		if strings.ToLower(message) == "да" || message == "" {
 			continue
 		} else {
@@ -50,49 +51,44 @@ func CreateTask(tasks []Task) []Task {
 	return tasks
 }
 
-func DeleteTask(tasks []Task) ([]Task, error) {
+func DeleteTask(tasks []Task) []Task {
 	fmt.Println("Какую задачу вы хотите удалить?")
-	numTasks, err := ReadTasksNumber(tasks)
-	if err != nil {
-		return tasks, err
-	}
+	numTasks := ReadTasksNumber(tasks)
+
 	fmt.Printf("Задача №%v %v будет удалена. Согласны? (да/нет)\n", numTasks, tasks[numTasks-1].Title)
-	message := acceptmessage()
+	message := cli.Acceptmessage()
 	if strings.ToLower(message) == "да" || message == "" {
 		tasks = append(tasks[:numTasks-1], tasks[numTasks:]...)
 	} else {
 		fmt.Printf("Задача №%v не была удалена.", numTasks)
-		return tasks, err
+		return tasks
 	}
 	fmt.Printf("Задача №%v была удалена, нумерация обновлена.", numTasks)
-	return tasks, nil
+	return tasks
 }
 
 func FixTask(tasks []Task) {
 	fmt.Println("Какую задачу вы хотите исправить?")
-	numTasks, err := ReadTasksNumber(tasks)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	numTasks := ReadTasksNumber(tasks)
+
 	fmt.Println("Что вы хотите исправить: \n" +
 		"1. Заголовок \n" +
 		"2. Описание \n" +
 		"3. Исполнитель")
-	message := acceptmessage()
+	message := cli.Acceptmessage()
 
 	taskElement, _ := strconv.Atoi(message)
 	if taskElement == 1 {
 		fmt.Println("На что вы хотите поменять заголовок?")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		tasks[numTasks-1].Title = message
 	} else if taskElement == 2 {
 		fmt.Println("На какие новое описание вы хотите поменять?")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		tasks[numTasks-1].Description = message
 	} else if taskElement == 3 {
 		fmt.Println("На какого исполнителя хотите поменять?")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		tasks[numTasks-1].Author = message
 	}
 	fmt.Printf("ИЗМЕНЕННАЯ ЗАДАЧА\n"+
@@ -107,16 +103,21 @@ func AllTasks(tasks []Task) {
 	}
 }
 
-func ReadTasksNumber(tasks []Task) (int, error) {
-	message := acceptmessage()
-	numTasks, err := strconv.Atoi(message)
-	if err != nil {
-		fmt.Println("Введите номер задачи")
-		return numTasks, err
+func ReadTasksNumber(tasks []Task) int {
+	for {
+		message := cli.Acceptmessage()
+
+		numTasks, err := strconv.Atoi(message)
+		if err != nil {
+			fmt.Println("Введите число")
+			continue
+		}
+
+		if numTasks < 1 || numTasks > len(tasks) {
+			fmt.Println("Такой задачи не существует!")
+			continue
+		}
+
+		return numTasks
 	}
-	if numTasks < 1 || numTasks > len(tasks) {
-		fmt.Println("Такой задачи не существует!")
-		return numTasks, err
-	}
-	return numTasks, nil
 }

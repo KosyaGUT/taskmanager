@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/KosyaGUT/taskmanager/internal/cli"
+	"github.com/KosyaGUT/taskmanager/internal/task"
 )
 
 func main() {
-	var tasks []Task
+	var tasks []task.Task
 	var message string
 
 	for flag := true; flag; {
@@ -16,16 +18,16 @@ func main() {
 			"3. Исправить задачу;\n" +
 			"4. Показать список.\n" +
 			"5. Выход")
-		message = acceptmessage()
+		message = cli.Acceptmessage()
 		switch message {
 		case "1":
-			tasks = CreateTask(tasks)
+			tasks = task.CreateTask(tasks)
 		case "2":
-			tasks, _ = DeleteTask(tasks)
+			tasks = task.DeleteTask(tasks)
 		case "3":
-			FixTask(tasks)
+			task.FixTask(tasks)
 		case "4":
-			AllTasks(tasks)
+			task.AllTasks(tasks)
 		case "5":
 			flag = false
 		}
