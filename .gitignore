@@ -1,0 +1,72 @@
+# === Результаты сборки Go ===
+# Исполняемые файлы (бинарники)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Стандартный результат команды go build
+/bin/
+#/[A-Za-z0-9]*
+
+# === Тесты и профилирование Go ===
+# Файлы тестов и отчеты о покрытии кода
+*.test
+*.out
+*.prof
+*.dump
+
+# === Зависимости ===
+# Папку vendor добавляют в Git только в редких случаях.
+# Если вы используете go mod, раскомментируйте строку ниже:
+# /vendor/
+
+# === Секреты и Локальные конфигурации ===
+# Никогда не отправляйте пароли и API-ключи в Git!
+.env
+.env.*
+!.env.example
+config.local.json
+config.local.yaml
+config.local.toml
+
+# === Локальные базы данных ===
+*.db
+*.sqlite
+*.sqlite3
+
+# === Редакторы кода и IDE ===
+# JetBrains / GoLand
+.idea/
+*.iml
+*.iws
+
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+
+# Временные файлы Vim и Emacs
+*~
+*.swp
+*.swo
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+/.dir-locals.el
+
+# === Системные файлы ===
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
