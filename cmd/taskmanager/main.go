@@ -8,7 +8,10 @@ import (
 
 func main() {
 	var tasks []task.Task
+	var users []task.User
 	var message string
+
+	users = task.Hello(users)
 
 	for flag := true; flag; {
 
@@ -17,7 +20,8 @@ func main() {
 			"2. Удалить задачу;\n" +
 			"3. Исправить задачу;\n" +
 			"4. Показать список.\n" +
-			"5. Выход")
+			"5. Профиль\n" +
+			"6. Выход")
 		message = cli.Acceptmessage()
 		switch message {
 		case "1":
@@ -29,6 +33,8 @@ func main() {
 		case "4":
 			task.AllTasks(tasks)
 		case "5":
+			task.Profile(users)
+		case "6":
 			flag = false
 		}
 

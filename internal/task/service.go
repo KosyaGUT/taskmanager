@@ -3,9 +3,63 @@ package task
 import (
 	"fmt"
 	"github.com/KosyaGUT/taskmanager/internal/cli"
+	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"strings"
 )
+
+func Registration(users []User) []User {
+	fmt.Println("Добро пожаловать! Это меню регистрации. Напишите, пожалуйста, своё имя и фамилию")
+	fistLastName := cli.Acceptmessage()
+	fistlastnameSlice := strings.Split(fistLastName, " ")
+	newUser := User{
+		LastName:  fistlastnameSlice[0],
+		FirstName: fistlastnameSlice[1],
+	}
+	fmt.Println("Отлично. Теперь напиши свой логин.")
+	userLogin := cli.Acceptmessage()
+	newUser.Login = userLogin
+	fmt.Println("Отлично. Теперь напиши свой пароль.")
+	password := cli.Acceptmessage()
+	hashedBytes, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
+	hashedString := string(hashedBytes)
+	newUser.Password = hashedString
+	users = append(users, newUser)
+	fmt.Printf("Вот ваш профиль\n"+
+		"ID %v\n"+
+		"Имя %v\n"+
+		"Фамилия %v\n"+
+		"Логин %v\n"+
+		"Пароль %v\n", users[0].id, users[0].LastName, users[0].FirstName, users[0].Login, users[0].Password)
+	fmt.Printf("Доброе пожаловать, %v %v\n", newUser.LastName, newUser.FirstName)
+	return users
+}
+
+func Hello(users []User) []User {
+	fmt.Println("Зравтвуйте! Вы уже зарегистрированы?\n" +
+		"1. Да;\n" +
+		"2. Нет.")
+	message := cli.Acceptmessage()
+	if message == "1" || message == "Да" {
+		Authentification()
+	} else {
+		users = Registration(users)
+	}
+	return users
+}
+
+func Profile(users []User) {
+	fmt.Printf("Вот ваш профиль\n"+
+		"ID %v\n"+
+		"Имя %v\n"+
+		"Фамилия %v\n"+
+		"Логин %v\n"+
+		"Пароль %v\n", users[0].id, users[0].LastName, users[0].FirstName, users[0].Login, users[0].Password)
+}
+
+func Authentification() {
+	return
+}
 
 func CreateTask(tasks []Task) []Task {
 	for {
