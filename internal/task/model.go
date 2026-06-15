@@ -5,15 +5,17 @@ import (
 )
 
 type Task struct {
-	Title       string
-	Description string
-	Author      string
+	Id           uuid.UUID `json:"id"`
+	CreatorLogin string    `json:"creator_login"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description,omitempty"`
+	Author       string    `json:"author,omitempty"`
 }
 
 type User struct {
-	id        uuid.UUID
-	Login     string
-	FirstName string
-	LastName  string
-	Password  string
+	Id        uuid.UUID `json:"id"`
+	Login     string    `json:"login"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Password  string    `json:"password"`
 }

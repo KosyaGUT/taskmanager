@@ -2,16 +2,28 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/KosyaGUT/taskmanager/internal/cli"
 	"github.com/KosyaGUT/taskmanager/internal/task"
 )
 
 func main() {
-	var tasks []task.Task
-	var users []task.User
 	var message string
+	tasks, err := task.LoadTasks()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	users = task.Hello(users)
+	users, err := task.LoadUsers()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	users, currentUser := task.Hello(users)
+	if currentUser == nil {
+		log.Fatal("Не удалось авторизоваться")
+	}
 
 	for flag := true; flag; {
 
@@ -25,7 +37,7 @@ func main() {
 		message = cli.Acceptmessage()
 		switch message {
 		case "1":
-			tasks = task.CreateTask(tasks)
+			tasks = task.CreateTask(tasks, currentUser)
 		case "2":
 			tasks = task.DeleteTask(tasks)
 		case "3":
@@ -33,7 +45,7 @@ func main() {
 		case "4":
 			task.AllTasks(tasks)
 		case "5":
-			task.Profile(users)
+			task.Profile(currentUser)
 		case "6":
 			flag = false
 		}

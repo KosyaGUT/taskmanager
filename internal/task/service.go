@@ -3,6 +3,7 @@ package task
 import (
 	"fmt"
 	"github.com/KosyaGUT/taskmanager/internal/cli"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ func Registration(users []User) []User {
 	fistLastName := cli.Acceptmessage()
 	fistlastnameSlice := strings.Split(fistLastName, " ")
 	newUser := User{
+		Id:        uuid.New(),
 		LastName:  fistlastnameSlice[0],
 		FirstName: fistlastnameSlice[1],
 	}
@@ -25,48 +27,83 @@ func Registration(users []User) []User {
 	hashedString := string(hashedBytes)
 	newUser.Password = hashedString
 	users = append(users, newUser)
-	fmt.Printf("Вот ваш профиль\n"+
-		"ID %v\n"+
-		"Имя %v\n"+
-		"Фамилия %v\n"+
-		"Логин %v\n"+
-		"Пароль %v\n", users[0].id, users[0].LastName, users[0].FirstName, users[0].Login, users[0].Password)
+	err := SaveUsers(users)
+	if err != nil {
+		return nil
+	}
 	fmt.Printf("Доброе пожаловать, %v %v\n", newUser.LastName, newUser.FirstName)
 	return users
 }
 
-func Hello(users []User) []User {
-	fmt.Println("Зравтвуйте! Вы уже зарегистрированы?\n" +
-		"1. Да;\n" +
-		"2. Нет.")
+func Hello(users []User) ([]User, *User) {
+
+	fmt.Println("Здравствуйте! Вы уже зарегистрированы?")
+	fmt.Println("1. Да")
+	fmt.Println("2. Нет")
+
 	message := cli.Acceptmessage()
-	if message == "1" || message == "Да" {
-		Authentification()
-	} else {
-		users = Registration(users)
+
+	if message == "1" {
+
+		user, err := Authentication(users)
+
+		if err != nil {
+			fmt.Println(err)
+			return users, nil
+		}
+
+		return users, user
 	}
-	return users
+
+	users = Registration(users)
+
+	return users, &users[len(users)-1]
 }
 
-func Profile(users []User) {
-	fmt.Printf("Вот ваш профиль\n"+
-		"ID %v\n"+
-		"Имя %v\n"+
-		"Фамилия %v\n"+
-		"Логин %v\n"+
-		"Пароль %v\n", users[0].id, users[0].LastName, users[0].FirstName, users[0].Login, users[0].Password)
+func Profile(user *User) {
+	fmt.Printf(
+		"ID: %v\n"+
+			"Имя: %v\n"+
+			"Фамилия: %v\n"+
+			"Логин: %v\n",
+		user.Id,
+		user.FirstName,
+		user.LastName,
+		user.Login,
+	)
 }
 
-func Authentification() {
-	return
+func Authentication(users []User) (*User, error) {
+	fmt.Print("Логин: ")
+	login := cli.Acceptmessage()
+
+	fmt.Print("Пароль: ")
+	password := cli.Acceptmessage()
+
+	for i := range users {
+
+		if users[i].Login != login {
+			continue
+		}
+
+		err := bcrypt.CompareHashAndPassword(
+			[]byte(users[i].Password),
+			[]byte(password),
+		)
+
+		if err == nil {
+			return &users[i], nil
+		}
+	}
+
+	return nil, fmt.Errorf("неверный логин или пароль")
 }
 
-func CreateTask(tasks []Task) []Task {
+func CreateTask(tasks []Task, currentUser *User) []Task {
 	for {
 		newTask := Task{
-			Title:       "",
-			Description: "",
-			Author:      "",
+			Id:           uuid.New(),
+			CreatorLogin: currentUser.Login,
 		}
 		fmt.Println("Напишите заголовок задачи:")
 		message := cli.Acceptmessage()
@@ -101,6 +138,10 @@ func CreateTask(tasks []Task) []Task {
 		} else {
 			break
 		}
+	}
+	err := SaveTasks(tasks)
+	if err != nil {
+		return nil
 	}
 	return tasks
 }
@@ -153,7 +194,14 @@ func FixTask(tasks []Task) {
 
 func AllTasks(tasks []Task) {
 	for j, task := range tasks {
-		fmt.Printf("Задача №%v %v, Исполнитель: %v, Описание: %v\n", j+1, task.Title, task.Author, task.Description)
+		fmt.Printf(
+			"Задача №%v %v, Создал: %v, Исполнитель: %v, Описание: %v\n",
+			j+1,
+			task.Title,
+			task.CreatorLogin,
+			task.Author,
+			task.Description,
+		)
 	}
 }
 
